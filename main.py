@@ -1,16 +1,21 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from collections import defaultdict
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+class Solution:
+    def maxNumberOfBalloons(self, text: str) -> int:
+        counts = defaultdict(int)
+        res = float('inf')
+        ballon = set("ballon")
+
+        for char in text:
+            if char in ballon:
+                counts[char]+=1
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+        for ch in ballon:
+            if ch == 'l' or ch == 'o':
+                res = min(res , counts[ch]//2)
+            else:
+                res = min(res , counts[ch])
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+        return res
