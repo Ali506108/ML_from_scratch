@@ -12,6 +12,7 @@ class LogisticRegression:
         b = 0
 
         return w ,b
+
     def sigmoid(self,z):
         s = 1/(1+np.exp(-z))
         return s
