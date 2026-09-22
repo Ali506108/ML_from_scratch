@@ -1,6 +1,5 @@
 import numpy as np
 
-
 class LinearRegression:
     "Linear Regression model"
     def compute_linear_model(self , x , w , b) :
