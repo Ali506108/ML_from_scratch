@@ -1,5 +1,8 @@
 from collections import defaultdict, deque
-from typing import Optional
+from typing import Optional, List
+
+import numpy as np
+from mpmath.functions.signals import sigmoid
 
 
 class ListNode:
@@ -144,3 +147,179 @@ class Solution:
                 left = mid + 1
 
         return res
+
+    def numberOfSubarrays(self, nums: List[int], k: int) -> int:
+        """
+
+        :param nums: [1,1,2,1,1]
+        :param k: 3
+        :return: 2
+
+        why is the solution is 2 ? because only 2 sub-arrays is -> [1,1,2,1] and [1,2,1,1]
+
+        1
+        after 1 - 3 = -2
+
+        """
+        hmap = {0:1}
+        c_num = 0
+        res = 0
+
+        for num in nums:
+            c_num+=num%2
+
+            if (c_num-k) in hmap:
+                res += hmap.get(c_num-k)
+
+            hmap[c_num] = hmap.get(c_num , 0 )+1
+
+        return res
+
+    def forward_prop(self):
+        x = np.array([[200,17]])
+
+        w1_1 = np.array([1,2])
+        b1_1 = np.array([-1])
+
+        z1_1 = np.dot(x,w1_1)+b1_1
+        a1_1 = sigmoid(z1_1)
+
+        w1_2 = np.array([-3,4])
+        b1_2 = np.array([1])
+
+        z1_2 = np.dot(w1_2 , x)+b1_2
+
+        a1_2 = sigmoid(z1_2)
+
+        w1_3 = np.array([5,-6])
+        b1_3 = np.array([2])
+
+
+        z1_3 = np.dot(w1_3 , x) + b1_3
+        a1_3 = sigmoid(z1_3)
+
+
+        a1 = np.array([a1_1,a1_2,a1_3])
+
+
+        w2_1 = np.array([-7,8,9])
+        b2_1 = np.array([3])
+
+        z2_1 = np.dot(w2_1 , a1)+b2_1
+
+        a2_1 = sigmoid(z2_1)
+
+        return a2_1
+
+
+
+
+    def dailyTemperatures(self , temperatures : list[int]) -> list[int]:
+        n = len(temperatures)
+        ans = [0]*n
+        stack = []
+
+        for i , temp in enumerate(temperatures) :
+
+            while stack and temperatures[stack[-1]]<temp:
+                prev_ind = stack.pop()
+                ans[prev_ind] = i - prev_ind
+            stack.append(i)
+
+        return ans
+
+    def isValid(self , str) -> bool:
+        stack = []
+        hmap = {
+            ')':'(',
+            '}':'{',
+            ']':'[',
+        }
+
+        for c in str:
+            if c in hmap:
+                t_e = stack.pop() if stack else '#'
+                if hmap[c] != t_e:
+                    return False
+            else:
+                stack.append(c)
+
+        return not stack
+
+    def simplifyPath(self, path: str) -> str:
+        """
+
+        :param path: /home/
+        :return: /home
+        """
+
+        stack = []
+        components = path.split('/')
+
+        for c in components:
+            if c == "" or c == ".":
+                continue
+            elif c == "..":
+                if stack:
+                    stack.pop()
+                else:
+                    stack.append(c)
+
+
+        return "/"+"/".join(stack)
+
+    def containsDuplicate(self, nums: List[int]) -> bool:
+        hset = set()
+
+        for n in nums:
+            if n in hset:
+                return True
+            hset.add(n)
+
+        return False
+
+    def isAnagram(self, s: str, t: str) -> bool:
+        if len(s) != len(t):
+            return False
+        sorted(s)
+
+        sorted(t)
+
+        for i in range(len(s)):
+            if s[i] != t[i]:
+                return False
+
+        return True
+
+
+
+    def dense(self , a_in , w,b):
+        units = w.shape
+        a_out = np.zeros(units)
+
+        for j in range(units):
+            w = w[:,j]
+            z = np.dot(w,a_in) + b[j]
+            a_out = g(z)
+
+        return a_out
+
+    def sequential(self , x):
+        a1 = self.dense(x,w1,b1)
+        a2 = self.dense(x,w3,b2)
+        a3 = self.dense(x,w3,b3)
+
+        return a3
+
+
+    def vector(self):
+        X = np.array[[200,17]]
+        W = np.array([[1,-3,5],
+                      [-2,4,-6],
+                      [-1,1,2]])
+
+        def dense(A_in,W,B):
+            Z = np.matmul(A_in,W)+B
+            A_out = g(Z)
+
+            return A_out
