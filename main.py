@@ -1,5 +1,6 @@
 from collections import defaultdict, deque
 from typing import Optional, List
+from abc import ABC , abstractclassmethod
 
 import numpy as np
 from mpmath.functions.signals import sigmoid
@@ -278,6 +279,24 @@ class Solution:
 
         return False
 
+
+    def mat_multiple(self):
+        A = np.array([[1,-1,0.1] ,
+                      [2,-2,0.2]
+                      ])
+
+        AT = np.array([[1,2],
+                       [-1,-2],
+                       [0.1,0.2]])
+
+        AT = A.T
+
+        W = np.array([[3,5,7,9],
+                      [4,6,8,0]
+                      ])
+
+        Z = np.matmul(AT,W)
+
     def isAnagram(self, s: str, t: str) -> bool:
         if len(s) != len(t):
             return False
@@ -323,3 +342,37 @@ class Solution:
             A_out = g(Z)
 
             return A_out
+
+    def classical_dense(self , a_in , w,b , g):
+        units = w.shape
+        a_out =  np.zeros(units)
+
+        for j in range(units):
+            w = w[:,j]
+            z = np.dot(w,a_in) + b
+            a_out[j] = g(z)
+
+        return a_out
+
+    def vector_dense(self ,a_in , w,b , g ):
+        z = np.matmul(a_in , w)+b
+        a_out = g(z)
+        return a_out
+
+
+class PreprocessingStrategy(ABC):
+    @abstractclassmethod
+    def transform(self , data: np.ndarray) -> np.ndarray:
+        pass
+
+class StandartScaler(PreprocessingStrategy):
+    def transform(self , data: np.ndarray) -> np.ndarray:
+        return (data - np.min(data , axis=0)) / (np.max(data,axis=0) - np.min(data,axis=0))
+
+class FeaturePipeline:
+    def __init__(self , strategy : PreprocessingStrategy):
+        self.strategy = strategy
+
+    def process(self , raw_data: np.ndarray) -> np.ndarray:
+        return self.strategy.transform(raw_data)
+
